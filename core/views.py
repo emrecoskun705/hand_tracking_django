@@ -7,6 +7,9 @@ from core.hand_gesture_detector import detector
 import numpy as np
 import pandas as pd
 
+from core.models import MLModel
+from core.serializers import MLResponseSerializer
+
 
 @api_view(['POST'])
 def get_ml(request):
@@ -26,5 +29,11 @@ def get_ml(request):
         column_name.append('hand')
 
         df = pd.DataFrame(data, columns=column_name)
-
-        return Response({'result': detector(df)}, status=status.HTTP_200_OK)
+        print(detector(df))
+        serializer = MLResponseSerializer(data={'result': str(detector(df))})
+        if serializer.is_valid():
+            print(1)
+            print(serializer.data)
+            return Response(serializer.data)
+        else:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
